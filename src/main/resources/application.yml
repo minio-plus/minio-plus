@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: minio-plus
+
+minio:
+  endpoint: http://47.112.226.124:9100
+  accessKey: minioadmin
+  secretKey: minioadmin
