@@ -1,4 +1,4 @@
-package org.quantum.minio.plus.dto.Query;
+package org.quantum.minio.plus.dto.query;
 
 /**
  * @author ike

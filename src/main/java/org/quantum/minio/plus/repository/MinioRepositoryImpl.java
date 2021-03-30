@@ -4,6 +4,7 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
+import io.minio.messages.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author ike
@@ -37,6 +39,17 @@ public class MinioRepositoryImpl implements MinioRepository {
     }
 
     @Override
+    public Optional<Tags> getBucketTags(String name) {
+        Tags tags = null;
+        try {
+            tags = minioClient.getBucketTags(GetBucketTagsArgs.builder().bucket(name).build());
+        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return Optional.of(tags);
+    }
+
+    @Override
     public void createBucket(String name) {
         try {
             minioClient.makeBucket(
@@ -60,8 +73,8 @@ public class MinioRepositoryImpl implements MinioRepository {
     }
 
     @Override
-    public Iterable<Result<Item>> getObjects() {
-        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket("liangwei").build());
+    public Iterable<Result<Item>> getObjects(ListObjectsArgs args) {
+        Iterable<Result<Item>> results = minioClient.listObjects(args);
         return results;
     }
 

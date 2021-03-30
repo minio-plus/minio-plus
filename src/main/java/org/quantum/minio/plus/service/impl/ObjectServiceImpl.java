@@ -1,11 +1,13 @@
 package org.quantum.minio.plus.service.impl;
 
+import io.minio.ListObjectsArgs;
 import io.minio.Result;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import org.quantum.minio.plus.dto.ObjectDTO;
+import org.quantum.minio.plus.dto.query.ObjectQuery;
 import org.quantum.minio.plus.repository.MinioRepository;
-import org.quantum.minio.plus.service.ObjectServiceI;
+import org.quantum.minio.plus.service.ObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +22,15 @@ import java.util.List;
  * @date 2021 年 03 月 29 日 18:09
  */
 @Service
-public class ObjectServiceImpl implements ObjectServiceI {
+public class ObjectServiceImpl implements ObjectService {
 
     @Autowired
     private MinioRepository minioRepository;
 
     @Override
-    public List<ObjectDTO> getList() {
+    public List<ObjectDTO> getList(ObjectQuery query) {
         List<ObjectDTO> dtos = new ArrayList<>();
-        Iterable<Result<Item>> results = minioRepository.getObjects();
+        Iterable<Result<Item>> results = minioRepository.getObjects(ListObjectsArgs.builder().bucket(query.getBucketName()).build());
         results.forEach(result -> {
             ObjectDTO dto = new ObjectDTO();
             try {

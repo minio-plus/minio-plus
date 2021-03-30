@@ -1,8 +1,8 @@
-package org.quantum.minio.plus.controller;
+package org.quantum.minio.plus.web.controller;
 
 import org.quantum.minio.plus.dto.BucketDTO;
 import org.quantum.minio.plus.dto.LifecycleCreateDTO;
-import org.quantum.minio.plus.service.BucketServiceI;
+import org.quantum.minio.plus.service.BucketService;
 import org.quantum.nucleus.component.dto.MultiResponse;
 import org.quantum.nucleus.component.dto.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ import java.util.List;
 @RestController
 public class BucketController {
 
-    private BucketServiceI bucketService;
+    private BucketService bucketService;
 
     @Autowired
-    public BucketController(BucketServiceI bucketService) {
+    public BucketController(BucketService bucketService) {
         this.bucketService = bucketService;
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
  * @author ike
  * @date 2021 年 03 月 29 日 17:31
  */
-public interface BucketServiceI {
+public interface BucketService {
 
     /**
      * 获取列表

@@ -1,6 +1,7 @@
 package org.quantum.minio.plus.dto;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 /**
  * 桶 数据传输对象
@@ -11,6 +12,8 @@ public class BucketDTO {
 
     private String name;
 
+    private Map<String, String> tags;
+
     private ZonedDateTime creationDate;
 
     public String getName() {
@@ -19,6 +22,14 @@ public class BucketDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Map<String, String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Map<String, String> tags) {
+        this.tags = tags;
     }
 
     public ZonedDateTime getCreationDate() {

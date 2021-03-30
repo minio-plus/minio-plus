@@ -1,7 +1,8 @@
-package org.quantum.minio.plus.controller;
+package org.quantum.minio.plus.web.controller;
 
 import org.quantum.minio.plus.dto.ObjectDTO;
-import org.quantum.minio.plus.service.ObjectServiceI;
+import org.quantum.minio.plus.dto.query.ObjectQuery;
+import org.quantum.minio.plus.service.ObjectService;
 import org.quantum.nucleus.component.dto.MultiResponse;
 import org.quantum.nucleus.component.dto.Response;
 import org.quantum.nucleus.component.dto.SingleResponse;
@@ -19,16 +20,16 @@ import java.util.List;
 @RestController
 public class ObjectController {
 
-    private ObjectServiceI objectService;
+    private ObjectService objectService;
 
     @Autowired
-    public ObjectController(ObjectServiceI objectService) {
+    public ObjectController(ObjectService objectService) {
         this.objectService = objectService;
     }
 
     @GetMapping("/list")
-    public MultiResponse<ObjectDTO> getList() {
-        List<ObjectDTO> dtos = objectService.getList();
+    public MultiResponse<ObjectDTO> getList(ObjectQuery query) {
+        List<ObjectDTO> dtos = objectService.getList(query);
         return MultiResponse.of(dtos);
     }
 
@@ -38,7 +39,22 @@ public class ObjectController {
     }
 
     @DeleteMapping
-    public Response delete(@RequestParam String name){
+    public Response delete(@RequestParam String name) {
         return Response.buildSuccess();
+    }
+
+    @GetMapping("/tags")
+    public MultiResponse getTags() {
+        return MultiResponse.buildSuccess();
+    }
+
+    @PostMapping("/tags")
+    public MultiResponse setTags() {
+        return MultiResponse.buildSuccess();
+    }
+
+    @DeleteMapping("/tags")
+    public MultiResponse deleteTag() {
+        return MultiResponse.buildSuccess();
     }
 }
