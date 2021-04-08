@@ -8,27 +8,46 @@ import java.time.ZonedDateTime;
  */
 public class ObjectDTO {
 
+    /**
+     * 标识
+     */
     private String etag;
 
     /**
-     * 名称
+     * 对象名称
      */
-    private String name;
+    private String objectName;
+
+    /**
+     * 最后更新时间
+     */
+    private ZonedDateTime lastModified;
+
+    /**
+     * 存储类
+     */
+    private String storageClass;
 
     /**
      * 大小
      */
     private Long size;
 
-    /**
-     * 类型
-     */
-    private String type;
 
     /**
-     * 最后更新时间
+     * 桶名称
      */
-    private ZonedDateTime lastUpdateTime;
+    private String bucketName;
+
+    /**
+     * 内容类型
+     */
+    private String contentType;
+
+    /**
+     * 是否是目录
+     */
+    private Boolean isDir;
 
     public String getEtag() {
         return etag;
@@ -38,12 +57,28 @@ public class ObjectDTO {
         this.etag = etag;
     }
 
-    public String getName() {
-        return name;
+    public String getObjectName() {
+        return objectName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setObjectName(String objectName) {
+        this.objectName = objectName;
+    }
+
+    public ZonedDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(ZonedDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getStorageClass() {
+        return storageClass;
+    }
+
+    public void setStorageClass(String storageClass) {
+        this.storageClass = storageClass;
     }
 
     public Long getSize() {
@@ -54,19 +89,27 @@ public class ObjectDTO {
         this.size = size;
     }
 
-    public String getType() {
-        return type;
+    public String getBucketName() {
+        return bucketName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
-    public ZonedDateTime getLastUpdateTime() {
-        return lastUpdateTime;
+    public String getContentType() {
+        return contentType;
     }
 
-    public void setLastUpdateTime(ZonedDateTime lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public Boolean getDir() {
+        return isDir;
+    }
+
+    public void setDir(Boolean dir) {
+        isDir = dir;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,27 +35,29 @@ public class ObjectController {
     }
 
     @RequestMapping("/upload")
-    public SingleResponse upload(MultipartFile multipartFile) {
+    public SingleResponse upload(@RequestParam String bucketName, @RequestPart("file") MultipartFile multipartFile) {
+        try {
+            ObjectDTO dto = new ObjectDTO();
+            dto.setBucketName(bucketName);
+            dto.setObjectName(multipartFile.getOriginalFilename());
+            dto.setSize(multipartFile.getSize());
+            dto.setContentType(multipartFile.getContentType());
+            objectService.create(dto, multipartFile.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return SingleResponse.buildSuccess();
+    }
+
+    @PostMapping("/folder")
+    public Response createFolder(@RequestBody ObjectDTO dto) {
+        dto.setObjectName(String.format("%s/", dto.getObjectName()));
+        objectService.create(dto);
+        return Response.buildSuccess();
     }
 
     @DeleteMapping
     public Response delete(@RequestParam String name) {
         return Response.buildSuccess();
-    }
-
-    @GetMapping("/tags")
-    public MultiResponse getTags() {
-        return MultiResponse.buildSuccess();
-    }
-
-    @PostMapping("/tags")
-    public MultiResponse setTags() {
-        return MultiResponse.buildSuccess();
-    }
-
-    @DeleteMapping("/tags")
-    public MultiResponse deleteTag() {
-        return MultiResponse.buildSuccess();
     }
 }

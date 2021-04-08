@@ -1,6 +1,9 @@
 package org.quantum.minio.plus.service;
 
+import io.minio.messages.LifecycleConfiguration;
 import org.quantum.minio.plus.dto.BucketDTO;
+import org.quantum.minio.plus.dto.BucketLifecycleRuleDTO;
+import org.quantum.minio.plus.dto.query.BucketLifecycleConfigurationQuery;
 
 import java.util.List;
 
@@ -27,4 +30,24 @@ public interface BucketService {
      * @param name
      */
     void remove(String name);
+
+    /**
+     * 获取生命周期规则列表
+     * @param lifecycleConfigurationQuery 生命周期配置查询
+     * @return
+     */
+    List<BucketLifecycleRuleDTO> getLifecycleRuleList(BucketLifecycleConfigurationQuery lifecycleConfigurationQuery);
+
+    /**
+     * 创建生命周期规则
+     * @param lifecycleRuleDto 生命周期规则数据传输对象
+     */
+    void createLifecycleRule(BucketLifecycleRuleDTO lifecycleRuleDto);
+
+    /**
+     * 删除生命周期规则
+     * @param bucketName 桶名称
+     * @param id 标识
+     */
+    void deleteLifecycleRule(String bucketName, String id);
 }

@@ -1,7 +1,9 @@
 package org.quantum.minio.plus.web.controller;
 
 import org.quantum.minio.plus.dto.BucketDTO;
+import org.quantum.minio.plus.dto.BucketLifecycleRuleDTO;
 import org.quantum.minio.plus.dto.LifecycleCreateDTO;
+import org.quantum.minio.plus.dto.query.BucketLifecycleConfigurationQuery;
 import org.quantum.minio.plus.service.BucketService;
 import org.quantum.nucleus.component.dto.MultiResponse;
 import org.quantum.nucleus.component.dto.Response;
@@ -43,19 +45,21 @@ public class BucketController {
         return Response.buildSuccess();
     }
 
-    @GetMapping("/lifecycle/list")
-    public MultiResponse<String> getLifecycleList(){
-        return MultiResponse.buildSuccess();
+    @GetMapping("/lifecycle/rule/list")
+    public MultiResponse<BucketLifecycleRuleDTO> getLifecycleRuleList(BucketLifecycleConfigurationQuery query) {
+        List<BucketLifecycleRuleDTO> lifecycleRuleDtos = bucketService.getLifecycleRuleList(query);
+        return MultiResponse.of(lifecycleRuleDtos);
     }
 
-    @PostMapping("/lifecycle")
-    public Response creareLifecycle(LifecycleCreateDTO dto){
+    @PostMapping("/lifecycle/rule")
+    public Response creareLifecycleRule(@RequestBody BucketLifecycleRuleDTO dto) {
+        bucketService.createLifecycleRule(dto);
         return Response.buildSuccess();
     }
 
-    @DeleteMapping("/lifecycle")
-    public Response deleteLifecycle(){
-
+    @DeleteMapping("/lifecycle/rule")
+    public Response deleteLifecycleRule(@RequestParam("bucketName") String bucketName, @RequestParam("id") String id) {
+        bucketService.deleteLifecycleRule(bucketName, id);
         return Response.buildSuccess();
     }
 }
