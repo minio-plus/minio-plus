@@ -19,7 +19,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author ike
@@ -38,7 +37,7 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     public List<ObjectDTO> getList(ObjectQuery query) {
         List<ObjectDTO> dtos = new ArrayList<>();
-        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(query.getBucketName()).build());
+        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(query.getBucketName()).prefix(query.getPrefix()).build());
         results.forEach(result -> {
             ObjectDTO dto = new ObjectDTO();
             try {
@@ -46,6 +45,7 @@ public class ObjectServiceImpl implements ObjectService {
                 dto.setEtag(item.etag());
                 dto.setObjectName(item.objectName());
                 dto.setSize(item.size());
+                dto.setUserMetaData(item.userMetadata());
 
                 if(!item.isDir()){
                     dto.setLastModified(item.lastModified());
@@ -77,6 +77,7 @@ public class ObjectServiceImpl implements ObjectService {
                             .object(dto.getObjectName())
                             .stream(inputStream, dto.getSize(), -1)
                             .contentType(dto.getContentType())
+                            .userMetadata(dto.getUserMetaData())
                             .build()
             );
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {

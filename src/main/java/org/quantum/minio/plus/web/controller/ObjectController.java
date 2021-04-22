@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ike
@@ -35,13 +36,17 @@ public class ObjectController {
     }
 
     @RequestMapping("/upload")
-    public SingleResponse upload(@RequestParam String bucketName, @RequestPart("file") MultipartFile multipartFile) {
+    public SingleResponse upload(
+            @RequestParam String bucketName,
+            @RequestParam Map<String, String> userMetaData,
+            @RequestPart("file") MultipartFile multipartFile) {
         try {
             ObjectDTO dto = new ObjectDTO();
             dto.setBucketName(bucketName);
             dto.setObjectName(multipartFile.getOriginalFilename());
             dto.setSize(multipartFile.getSize());
             dto.setContentType(multipartFile.getContentType());
+            dto.setUserMetaData(userMetaData);
             objectService.create(dto, multipartFile.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();

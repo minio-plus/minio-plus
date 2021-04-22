@@ -37,6 +37,11 @@ public class BucketLifecycleRuleDTO {
     private Map<String, String> tags;
 
     /**
+     * 清除策略
+     */
+    private String cleanStrategy;
+
+    /**
      * 天数
      */
     private Integer days;
@@ -84,6 +89,14 @@ public class BucketLifecycleRuleDTO {
 
     public void setTags(Map<String, String> tags) {
         this.tags = tags;
+    }
+
+    public String getCleanStrategy() {
+        return cleanStrategy;
+    }
+
+    public void setCleanStrategy(String cleanStrategy) {
+        this.cleanStrategy = cleanStrategy;
     }
 
     public Integer getDays() {

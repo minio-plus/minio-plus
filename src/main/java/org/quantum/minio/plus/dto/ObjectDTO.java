@@ -1,6 +1,7 @@
 package org.quantum.minio.plus.dto;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 /**
  * @author ike
@@ -48,6 +49,8 @@ public class ObjectDTO {
      * 是否是目录
      */
     private Boolean isDir;
+
+    private Map<String, String> userMetaData;
 
     public String getEtag() {
         return etag;
@@ -111,5 +114,13 @@ public class ObjectDTO {
 
     public void setDir(Boolean dir) {
         isDir = dir;
+    }
+
+    public Map<String, String> getUserMetaData() {
+        return userMetaData;
+    }
+
+    public void setUserMetaData(Map<String, String> userMetaData) {
+        this.userMetaData = userMetaData;
     }
 }

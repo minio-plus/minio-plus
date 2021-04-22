@@ -4,6 +4,9 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.*;
 import org.apache.commons.lang3.StringUtils;
+import org.quantum.minio.plus.BizException;
+import org.quantum.minio.plus.BizExceptionState;
+import org.quantum.minio.plus.CleanStrategy;
 import org.quantum.minio.plus.StorageClass;
 import org.quantum.minio.plus.dto.BucketDTO;
 import org.quantum.minio.plus.dto.BucketLifecycleRuleDTO;
@@ -15,9 +18,12 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
+ * 桶服务实现
  * @author ike
  * @date 2021 年 03 月 29 日 17:31
  */
@@ -106,34 +112,48 @@ public class BucketServiceImpl implements BucketService {
     @Override
     public void createLifecycleRule(BucketLifecycleRuleDTO lifecycleRuleDto) {
         String id = UUID.randomUUID().toString();
-        Map<String, String> tags = lifecycleRuleDto.getTags();
-        Status status = Status.ENABLED;
 
+        Status status = Status.ENABLED;
         if(Status.DISABLED.toString().equals(lifecycleRuleDto.getStatus())){
             status = Status.DISABLED;
         }
 
-        // 规则过滤
-        AndOperator andOperator = new AndOperator(lifecycleRuleDto.getPrefix(), tags);
-        RuleFilter ruleFilter = new RuleFilter(andOperator);
-        // 到期时间
-        Expiration expiration = null;
-        if(Objects.nonNull(lifecycleRuleDto.getDate()) || lifecycleRuleDto.getDays() > 0) {
-            expiration = new Expiration(lifecycleRuleDto.getDate(), lifecycleRuleDto.getDays(), null);
+        // 过期策略
+        Expiration expiration;
+        if(CleanStrategy.EXPIRATION_DATE.toString().equals(lifecycleRuleDto.getCleanStrategy())) {
+            ZonedDateTime zonedDateTime = lifecycleRuleDto.getDate();
+            // 日期过期，时间必须是格林威治时间的午夜
+            expiration = new Expiration(zonedDateTime.withHour(0).withMinute(0).withSecond(0), null, null);
+        } else if(CleanStrategy.EXPIRATION_DAYS.toString().equals(lifecycleRuleDto.getCleanStrategy())) {
+            // 天数过期
+            expiration = new Expiration((ZonedDateTime) null, lifecycleRuleDto.getDays(), null);
+        } else {
+            // 参数错误
+            throw new BizException(BizExceptionState.PARAMETER_ERROR);
         }
 
         try {
+            // 规则处理
+            // 查询已存在的配置
             LifecycleConfiguration lifecycleConfiguration = minioClient.getBucketLifecycle(GetBucketLifecycleArgs.builder().bucket(lifecycleRuleDto.getBucketName()).build());
+
             List<LifecycleRule> rules = new LinkedList<>();
             if(Objects.nonNull(lifecycleConfiguration) && Objects.nonNull(lifecycleConfiguration.rules())){
                 rules = new LinkedList(lifecycleConfiguration.rules());
             }
-            // 如果前缀为空且规则大于0 或者如果 已存在一个规则并且前缀为空 ，直接放弃所有以免出错，前端应提示此敏感操作。
+            // 如果前缀为空且规则大于0 或者如果 已存在一个规则并且前缀为空，直接放弃所有以免出错，前端应提示此敏感操作。
             if(StringUtils.isEmpty(lifecycleRuleDto.getPrefix()) && rules.size() > 0) {
                 rules = new LinkedList<>();
-            }else if(rules.size() == 1 && StringUtils.isEmpty(rules.get(0).filter().andOperator().prefix())){
+            } else if(rules.size() == 1 && Objects.isNull(rules.get(0).filter().andOperator())) {
+                rules = new LinkedList<>();
+            } else if(rules.size() == 1 && StringUtils.isEmpty(rules.get(0).filter().andOperator().prefix())) {
                 rules = new LinkedList<>();
             }
+
+            // 规则过滤配置
+            Map<String, String> tags = lifecycleRuleDto.getTags();
+            AndOperator andOperator = new AndOperator(lifecycleRuleDto.getPrefix(), tags);
+            RuleFilter ruleFilter = new RuleFilter(andOperator);
 
             rules.add(new LifecycleRule(
                             status,

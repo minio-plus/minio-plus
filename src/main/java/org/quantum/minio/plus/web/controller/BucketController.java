@@ -57,6 +57,11 @@ public class BucketController {
         return Response.buildSuccess();
     }
 
+    @PutMapping("/lifecycle/rule")
+    public Response updateLifecycleRule(@RequestBody BucketLifecycleRuleDTO dto) {
+        return Response.buildSuccess();
+    }
+
     @DeleteMapping("/lifecycle/rule")
     public Response deleteLifecycleRule(@RequestParam("bucketName") String bucketName, @RequestParam("id") String id) {
         bucketService.deleteLifecycleRule(bucketName, id);

@@ -9,11 +9,21 @@ public class ObjectQuery {
 
     private String bucketName;
 
+    private String prefix;
+
     public String getBucketName() {
         return bucketName;
     }
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 }
