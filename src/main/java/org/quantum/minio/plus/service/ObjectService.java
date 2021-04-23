@@ -4,6 +4,7 @@ import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ public interface ObjectService {
      */
     List<ObjectDTO> getList(ObjectQuery query);
 
+    List getFragmentList();
+
     /**
      * 创建
      * @param dto 传输对象
@@ -33,4 +36,11 @@ public interface ObjectService {
      * @return
      */
     void create(ObjectDTO dto);
+
+
+    /**
+     * 删除
+     * @param objectName
+     */
+    void delete(String bucketName, String objectName);
 }

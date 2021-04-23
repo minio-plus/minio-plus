@@ -1,5 +1,7 @@
 package org.quantum.minio.plus.dto.query;
 
+import java.util.List;
+
 /**
  * 对象查询
  * @author ike
@@ -9,7 +11,7 @@ public class ObjectQuery {
 
     private String bucketName;
 
-    private String prefix;
+    private List<String> prefixs;
 
     public String getBucketName() {
         return bucketName;
@@ -19,11 +21,11 @@ public class ObjectQuery {
         this.bucketName = bucketName;
     }
 
-    public String getPrefix() {
-        return prefix;
+    public List<String> getPrefixs() {
+        return prefixs;
     }
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
+    public void setPrefixs(List<String> prefixs) {
+        this.prefixs = prefixs;
     }
 }

@@ -29,8 +29,8 @@ public class ObjectController {
         this.objectService = objectService;
     }
 
-    @GetMapping("/list")
-    public MultiResponse<ObjectDTO> getList(ObjectQuery query) {
+    @PostMapping("/list")
+    public MultiResponse<ObjectDTO> getList(@RequestBody ObjectQuery query) {
         List<ObjectDTO> dtos = objectService.getList(query);
         return MultiResponse.of(dtos);
     }
@@ -62,7 +62,8 @@ public class ObjectController {
     }
 
     @DeleteMapping
-    public Response delete(@RequestParam String name) {
+    public Response delete(@RequestParam String bucketName, @RequestParam String objectName) {
+        objectService.delete(bucketName, objectName);
         return Response.buildSuccess();
     }
 }

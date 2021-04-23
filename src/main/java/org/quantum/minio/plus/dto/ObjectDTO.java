@@ -1,6 +1,7 @@
 package org.quantum.minio.plus.dto;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +51,15 @@ public class ObjectDTO {
      */
     private Boolean isDir;
 
+    /**
+     * 用户元数据
+     */
     private Map<String, String> userMetaData;
+
+    /**
+     * 前缀列表
+     */
+    private List<String> prefixs;
 
     public String getEtag() {
         return etag;
@@ -122,5 +131,13 @@ public class ObjectDTO {
 
     public void setUserMetaData(Map<String, String> userMetaData) {
         this.userMetaData = userMetaData;
+    }
+
+    public List<String> getPrefixs() {
+        return prefixs;
+    }
+
+    public void setPrefixs(List<String> prefixs) {
+        this.prefixs = prefixs;
     }
 }

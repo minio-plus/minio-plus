@@ -1,9 +1,6 @@
 package org.quantum.minio.plus.service.impl;
 
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.Result;
+import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import org.quantum.minio.plus.dto.ObjectDTO;
@@ -19,6 +16,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author ike
@@ -37,7 +36,15 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     public List<ObjectDTO> getList(ObjectQuery query) {
         List<ObjectDTO> dtos = new ArrayList<>();
-        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(query.getBucketName()).prefix(query.getPrefix()).build());
+
+        ListObjectsArgs.Builder argsBuilder = ListObjectsArgs.builder();
+        argsBuilder.bucket(query.getBucketName());
+        List<String> prefixs = query.getPrefixs();
+        if(Objects.nonNull(prefixs) && prefixs.size() > 0){
+            argsBuilder.prefix(prefixs.stream().collect(Collectors.joining()));
+        }
+
+        Iterable<Result<Item>> results = minioClient.listObjects(argsBuilder.build());
         results.forEach(result -> {
             ObjectDTO dto = new ObjectDTO();
             try {
@@ -69,12 +76,18 @@ public class ObjectServiceImpl implements ObjectService {
     }
 
     @Override
+    public List getFragmentList() {
+        return null;
+    }
+
+    @Override
     public void create(ObjectDTO dto, InputStream inputStream) {
         try {
+            String objectName = this.objectNameHandler(dto);
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(dto.getBucketName())
-                            .object(dto.getObjectName())
+                            .object(objectName)
                             .stream(inputStream, dto.getSize(), -1)
                             .contentType(dto.getContentType())
                             .userMetadata(dto.getUserMetaData())
@@ -88,15 +101,34 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     public void create(ObjectDTO dto) {
         try {
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(dto.getBucketName())
-                            .object(dto.getObjectName())
-                            .stream(new ByteArrayInputStream(new byte[] {}), 0, -1)
-                            .build()
-            );
+            String objectName = objectNameHandler(dto);
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(dto.getBucketName())
+                    .object(objectName)
+                    .stream(new ByteArrayInputStream(new byte[] {}), 0, -1)
+                    .build());
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void delete(String bucketName, String objectName) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
+        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String objectNameHandler(ObjectDTO dto) {
+        String targetName;
+        List<String> prefixs = dto.getPrefixs();
+        if(Objects.nonNull(prefixs) && prefixs.size() > 0){
+            targetName = prefixs.stream().collect(Collectors.joining()) + dto.getObjectName();
+        } else {
+            targetName = dto.getObjectName();
+        }
+        return targetName;
     }
 }

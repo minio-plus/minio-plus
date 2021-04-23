@@ -14,7 +14,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
         <nucleus-component.version>1.0.0</nucleus-component.version>
-        <minio.version>8.1.0</minio.version>
+        <minio.version>8.2.1</minio.version>
     </properties>
 
     <dependencies>
