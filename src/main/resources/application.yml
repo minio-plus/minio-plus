@@ -6,6 +6,6 @@ spring:
     name: minio-plus
 
 minio:
-  endpoint: http://192.168.233.128:9100
-  accessKey: minioadmin
-  secretKey: minioadmin
+  endpoint: http://192.168.233.129:9100
+  accessKey: root
+  secretKey: Dev@123456

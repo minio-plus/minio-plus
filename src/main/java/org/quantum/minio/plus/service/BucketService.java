@@ -1,6 +1,5 @@
 package org.quantum.minio.plus.service;
 
-import io.minio.messages.LifecycleConfiguration;
 import org.quantum.minio.plus.dto.BucketDTO;
 import org.quantum.minio.plus.dto.BucketLifecycleRuleDTO;
 import org.quantum.minio.plus.dto.query.BucketLifecycleConfigurationQuery;

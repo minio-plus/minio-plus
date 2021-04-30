@@ -2,7 +2,9 @@ package org.quantum.minio.plus.service.impl;
 
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.http.Method;
 import io.minio.messages.Item;
+import io.minio.messages.Upload;
 import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
 import org.quantum.minio.plus.service.ObjectService;
@@ -76,8 +78,21 @@ public class ObjectServiceImpl implements ObjectService {
     }
 
     @Override
-    public List getFragmentList() {
-        return null;
+    public String getPresignedPutUrl(String bucketName, String objectName) {
+        String url = "";
+        try {
+            url = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs
+                            .builder()
+                            .method(Method.PUT)
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build()
+            );
+        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return url;
     }
 
     @Override
@@ -115,7 +130,13 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     public void delete(String bucketName, String objectName) {
         try {
-            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
+            minioClient.removeObject(
+                    RemoveObjectArgs
+                            .builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build()
+            );
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

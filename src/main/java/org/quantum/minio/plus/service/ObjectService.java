@@ -20,7 +20,11 @@ public interface ObjectService {
      */
     List<ObjectDTO> getList(ObjectQuery query);
 
-    List getFragmentList();
+    /**
+     * 获取预签名
+     * @return
+     */
+    String getPresignedPutUrl(String bucketName, String objectName);
 
     /**
      * 创建
