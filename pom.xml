@@ -42,6 +42,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.quantum</groupId>
             <artifactId>nucleus-component-dto</artifactId>
             <version>${nucleus-component.version}</version>
@@ -72,6 +77,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>1.11.1014</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

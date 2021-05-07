@@ -67,4 +67,12 @@ public class BucketController {
         bucketService.deleteLifecycleRule(bucketName, id);
         return Response.buildSuccess();
     }
+
+    @PostMapping("/compose")
+    public Response compose(
+            @RequestBody String bucketName,
+            List<String> parts
+    ){
+        return Response.buildSuccess();
+    }
 }

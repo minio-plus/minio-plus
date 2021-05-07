@@ -1,11 +1,19 @@
 package org.quantum.minio.plus.service;
 
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
+import com.amazonaws.services.s3.model.PartETag;
+import com.amazonaws.services.s3.model.PartListing;
+import com.amazonaws.services.s3.model.UploadPartResult;
+import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
+import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.ObjectDTO;
+import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
 
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ike
@@ -21,10 +29,45 @@ public interface ObjectService {
     List<ObjectDTO> getList(ObjectQuery query);
 
     /**
-     * 获取预签名
+     * 创建多部分上传
+     * @param bucketName 桶名称
+     * @param key 键
      * @return
      */
-    String getPresignedPutUrl(String bucketName, String objectName);
+    MultipartUploadDTO createMultipartUpload(String bucketName, String key);
+
+    /**
+     * 获取上传部分列表
+     * @param bucketName 桶名称
+     * @param key 键
+     * @param uploadId 上传标识
+     * @return
+     */
+    List<UploadPartDTO> getUploadPartList(String bucketName, String key, String uploadId);
+
+    /**
+     * 合成上传部分
+     * @param dto 传输对象
+     * @return
+     */
+    String composeUploadPart(ComposeUploadPartDTO dto);
+
+    /**
+     * 获取预签名
+     * @param bucketName 桶名称
+     * @param objectName 对象名称
+     * @param method 方式
+     * @return
+     */
+    String getPresignedUrl(String bucketName, String objectName, String method);
+
+    /**
+     * 获取预签名表单数据
+     * @param bucketName
+     * @param objectName
+     * @return
+     */
+    Map<String, String> getPresignedFormData(String bucketName, String objectName);
 
     /**
      * 创建
@@ -40,6 +83,15 @@ public interface ObjectService {
      * @return
      */
     void create(ObjectDTO dto);
+
+    /**
+     * 合并
+     * @param bucketName
+     * @param objectName
+     * @param parts
+     * @return
+     */
+    String compose(String bucketName, String objectName, List<String> parts);
 
 
     /**

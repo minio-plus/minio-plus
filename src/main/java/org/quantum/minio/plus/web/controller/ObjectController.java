@@ -1,6 +1,12 @@
 package org.quantum.minio.plus.web.controller;
 
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
+import com.amazonaws.services.s3.model.PartListing;
+import com.amazonaws.services.s3.model.UploadPartResult;
+import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
+import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.ObjectDTO;
+import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
 import org.quantum.minio.plus.service.ObjectService;
 import org.quantum.nucleus.component.dto.MultiResponse;
@@ -35,6 +41,26 @@ public class ObjectController {
         return MultiResponse.of(dtos);
     }
 
+    @PostMapping("/uploadmultipart")
+    public SingleResponse<MultipartUploadDTO> createMultipartUpload(@RequestParam String bucketName, @RequestParam String key){
+        MultipartUploadDTO dto = objectService.createMultipartUpload(bucketName, key);
+        return SingleResponse.of(dto);
+    }
+
+    @GetMapping("/upload/part")
+    public MultiResponse<UploadPartDTO> getUploadPart(@RequestParam String bucketName, @RequestParam String key, @RequestParam String uploadId) {
+        List<UploadPartDTO> dtos = objectService.getUploadPartList(bucketName, key, uploadId);
+        return MultiResponse.of(dtos);
+    }
+
+    @PostMapping("/upload/part/compose")
+    public SingleResponse<String> composeUploadPart(@RequestBody ComposeUploadPartDTO dto){
+        String location = objectService.composeUploadPart(dto);
+        return SingleResponse.of(location);
+    }
+
+
+
     @RequestMapping("/upload")
     public SingleResponse upload(
             @RequestParam String bucketName,
@@ -52,6 +78,23 @@ public class ObjectController {
             e.printStackTrace();
         }
         return SingleResponse.buildSuccess();
+    }
+
+    @GetMapping("/presigned/formdata")
+    public SingleResponse<Map<String, String>> getPresignedFormData(
+            @RequestParam String bucketName,
+            @RequestParam String objectName){
+        Map<String, String> map = objectService.getPresignedFormData(bucketName, objectName);
+        return SingleResponse.of(map);
+    }
+
+    @GetMapping("/presigned/url")
+    public SingleResponse<String> getPresignedUrl(
+            @RequestParam String bucketName,
+            @RequestParam String objectName,
+            @RequestParam String method) {
+        String url = objectService.getPresignedUrl(bucketName, objectName, method);
+        return SingleResponse.of(url);
     }
 
     @PostMapping("/folder")

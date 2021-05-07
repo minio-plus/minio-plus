@@ -1,11 +1,16 @@
 package org.quantum.minio.plus.service.impl;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.transfer.model.UploadResult;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Item;
-import io.minio.messages.Upload;
+import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
+import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.ObjectDTO;
+import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
 import org.quantum.minio.plus.service.ObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +37,9 @@ import java.util.stream.Collectors;
 public class ObjectServiceImpl implements ObjectService {
 
     private MinioClient minioClient;
+
+    @Autowired
+    private AmazonS3 amazonS3;
 
     @Autowired
     public void setMinioClient(MinioClient minioClient) {
@@ -78,13 +89,55 @@ public class ObjectServiceImpl implements ObjectService {
     }
 
     @Override
-    public String getPresignedPutUrl(String bucketName, String objectName) {
+    public MultipartUploadDTO createMultipartUpload(String bucketName, String key) {
+        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, key);
+        InitiateMultipartUploadResult result = amazonS3.initiateMultipartUpload(request);
+
+        MultipartUploadDTO dto = new MultipartUploadDTO();
+        dto.setUploadId(result.getUploadId());
+        dto.setKey(result.getKey());
+        return dto;
+    }
+
+    @Override
+    public List<UploadPartDTO> getUploadPartList(String bucketName, String key, String uploadId) {
+        List<UploadPartDTO> dtos = new ArrayList<>();
+
+        ListPartsRequest request = new ListPartsRequest(bucketName, key, uploadId);
+        PartListing uploadResult = amazonS3.listParts(request);
+        List<PartSummary> partSummaries = uploadResult.getParts();
+        partSummaries.forEach(partSummary -> {
+            UploadPartDTO dto = new UploadPartDTO();
+            dto.seteTag(partSummary.getETag());
+            dto.setSize(partSummary.getSize());
+            dto.setPartNumber(partSummary.getPartNumber());
+            dtos.add(dto);
+        });
+        return dtos;
+    }
+
+    @Override
+    public String composeUploadPart(ComposeUploadPartDTO dto) {
+        List<PartETag> partETags = new ArrayList<>();
+        dto.getParts().forEach(uploadPartDto -> {
+            PartETag partETag = new PartETag(uploadPartDto.getPartNumber(), uploadPartDto.geteTag().substring(1, uploadPartDto.geteTag().length() - 1));
+            partETags.add(partETag);
+        });
+
+        CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(dto.getBucketName(), dto.getKey(), dto.getUploadId(), partETags);
+        CompleteMultipartUploadResult result = amazonS3.completeMultipartUpload(request);
+        return String.format("%s/%s/%s", "http://192.168.233.129:9100", result.getBucketName(), result.getKey());
+    }
+
+    @Override
+    public String getPresignedUrl(String bucketName, String objectName, String method) {
         String url = "";
         try {
             url = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs
                             .builder()
-                            .method(Method.PUT)
+                            .method(Method.valueOf(method))
+                            .expiry(7, TimeUnit.DAYS)
                             .bucket(bucketName)
                             .object(objectName)
                             .build()
@@ -93,6 +146,20 @@ public class ObjectServiceImpl implements ObjectService {
             e.printStackTrace();
         }
         return url;
+    }
+
+    @Override
+    public Map<String, String> getPresignedFormData(String bucketName, String objectName) {
+        PostPolicy policy = new PostPolicy(bucketName, ZonedDateTime.now().plusDays(7));
+        policy.addEqualsCondition("key", objectName);
+
+        Map<String, String> formData = null;
+        try {
+            formData = minioClient.getPresignedPostFormData(policy);
+        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return formData;
     }
 
     @Override
@@ -125,6 +192,20 @@ public class ObjectServiceImpl implements ObjectService {
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String compose(String bucketName, String objectName, List<String> parts) {
+        List<ComposeSource> sourceObjectList = new ArrayList<>();
+        parts.forEach(part -> {
+            sourceObjectList.add(ComposeSource.builder().bucket(bucketName).object(part).build());
+        });
+        try {
+            minioClient.composeObject(ComposeObjectArgs.builder().bucket(bucketName).object(objectName).sources(sourceObjectList).build());
+        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return String.format("%s/%s/%s");
     }
 
     @Override
