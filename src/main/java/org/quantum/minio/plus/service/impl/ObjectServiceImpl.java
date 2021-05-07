@@ -7,11 +7,13 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Item;
+import io.minio.messages.ListMultipartUploadsResult;
 import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
 import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
+import org.quantum.minio.plus.dto.query.PartQuery;
 import org.quantum.minio.plus.service.ObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,12 +40,12 @@ public class ObjectServiceImpl implements ObjectService {
 
     private MinioClient minioClient;
 
-    @Autowired
     private AmazonS3 amazonS3;
 
     @Autowired
-    public void setMinioClient(MinioClient minioClient) {
+    public void setMinioClient(MinioClient minioClient, AmazonS3 amazonS3) {
         this.minioClient = minioClient;
+        this.amazonS3 = amazonS3;
     }
 
     @Override
@@ -75,6 +77,7 @@ public class ObjectServiceImpl implements ObjectService {
                 dto.setDir(item.isDir());
             } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
                 // 有问题
+                return;
             }
             dtos.add(dto);
         });
@@ -89,8 +92,8 @@ public class ObjectServiceImpl implements ObjectService {
     }
 
     @Override
-    public MultipartUploadDTO createMultipartUpload(String bucketName, String key) {
-        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, key);
+    public MultipartUploadDTO initiateMultipartUpload(MultipartUploadDTO inputDto) {
+        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(inputDto.getBucketName(), inputDto.getKey());
         InitiateMultipartUploadResult result = amazonS3.initiateMultipartUpload(request);
 
         MultipartUploadDTO dto = new MultipartUploadDTO();
@@ -100,15 +103,31 @@ public class ObjectServiceImpl implements ObjectService {
     }
 
     @Override
-    public List<UploadPartDTO> getUploadPartList(String bucketName, String key, String uploadId) {
+    public List<MultipartUploadDTO> getMultipartUploadList(String bucketName) {
+        List<MultipartUploadDTO> dtos = new ArrayList<>();
+
+        ListMultipartUploadsRequest request = new ListMultipartUploadsRequest(bucketName);
+        MultipartUploadListing listing = amazonS3.listMultipartUploads(request);
+        List<MultipartUpload> multipartUploads = listing.getMultipartUploads();
+        multipartUploads.forEach(multipartUpload -> {
+            MultipartUploadDTO dto = new MultipartUploadDTO();
+            dto.setKey(multipartUpload.getKey());
+            dto.setUploadId(multipartUpload.getUploadId());
+            dtos.add(dto);
+        });
+        return dtos;
+    }
+
+    @Override
+    public List<UploadPartDTO> getUploadPartList(PartQuery partQuery) {
         List<UploadPartDTO> dtos = new ArrayList<>();
 
-        ListPartsRequest request = new ListPartsRequest(bucketName, key, uploadId);
+        ListPartsRequest request = new ListPartsRequest(partQuery.getBucketName(), partQuery.getKey(), partQuery.getUploadId());
         PartListing uploadResult = amazonS3.listParts(request);
         List<PartSummary> partSummaries = uploadResult.getParts();
         partSummaries.forEach(partSummary -> {
             UploadPartDTO dto = new UploadPartDTO();
-            dto.seteTag(partSummary.getETag());
+            dto.setETag(partSummary.getETag());
             dto.setSize(partSummary.getSize());
             dto.setPartNumber(partSummary.getPartNumber());
             dtos.add(dto);
@@ -120,13 +139,13 @@ public class ObjectServiceImpl implements ObjectService {
     public String composeUploadPart(ComposeUploadPartDTO dto) {
         List<PartETag> partETags = new ArrayList<>();
         dto.getParts().forEach(uploadPartDto -> {
-            PartETag partETag = new PartETag(uploadPartDto.getPartNumber(), uploadPartDto.geteTag().substring(1, uploadPartDto.geteTag().length() - 1));
+            PartETag partETag = new PartETag(uploadPartDto.getPartNumber(), uploadPartDto.getETag().substring(1, uploadPartDto.getETag().length() - 1));
             partETags.add(partETag);
         });
 
         CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(dto.getBucketName(), dto.getKey(), dto.getUploadId(), partETags);
-        CompleteMultipartUploadResult result = amazonS3.completeMultipartUpload(request);
-        return String.format("%s/%s/%s", "http://192.168.233.129:9100", result.getBucketName(), result.getKey());
+        amazonS3.completeMultipartUpload(request);
+        return this.getPresignedUrl(dto.getBucketName(), dto.getKey(), Method.GET.toString());
     }
 
     @Override
@@ -160,24 +179,6 @@ public class ObjectServiceImpl implements ObjectService {
             e.printStackTrace();
         }
         return formData;
-    }
-
-    @Override
-    public void create(ObjectDTO dto, InputStream inputStream) {
-        try {
-            String objectName = this.objectNameHandler(dto);
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(dto.getBucketName())
-                            .object(objectName)
-                            .stream(inputStream, dto.getSize(), -1)
-                            .contentType(dto.getContentType())
-                            .userMetadata(dto.getUserMetaData())
-                            .build()
-            );
-        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

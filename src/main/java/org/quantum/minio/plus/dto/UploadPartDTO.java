@@ -12,11 +12,11 @@ public class UploadPartDTO {
 
     private Long Size;
 
-    public String geteTag() {
+    public String getETag() {
         return eTag;
     }
 
-    public void seteTag(String eTag) {
+    public void setETag(String eTag) {
         this.eTag = eTag;
     }
 

@@ -1,4 +1,4 @@
-package org.quantum.minio.plus;
+package org.quantum.minio.plus.constant;
 
 /**
  * 存储类

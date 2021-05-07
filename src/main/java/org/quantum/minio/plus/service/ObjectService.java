@@ -1,17 +1,12 @@
 package org.quantum.minio.plus.service;
 
-import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
-import com.amazonaws.services.s3.model.PartETag;
-import com.amazonaws.services.s3.model.PartListing;
-import com.amazonaws.services.s3.model.UploadPartResult;
 import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
 import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
+import org.quantum.minio.plus.dto.query.PartQuery;
 
-import java.io.InputStream;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -29,21 +24,25 @@ public interface ObjectService {
     List<ObjectDTO> getList(ObjectQuery query);
 
     /**
-     * 创建多部分上传
-     * @param bucketName 桶名称
-     * @param key 键
+     * 初始化多部分上传
+     * @param inputDto 输入传输对象
      * @return
      */
-    MultipartUploadDTO createMultipartUpload(String bucketName, String key);
+    MultipartUploadDTO initiateMultipartUpload(MultipartUploadDTO inputDto);
+
+    /**
+     * 获取多部分上传列表
+     * @param bucketName
+     * @return
+     */
+    List<MultipartUploadDTO> getMultipartUploadList(String bucketName);
 
     /**
      * 获取上传部分列表
-     * @param bucketName 桶名称
-     * @param key 键
-     * @param uploadId 上传标识
+     * @param partQuery 部分查询
      * @return
      */
-    List<UploadPartDTO> getUploadPartList(String bucketName, String key, String uploadId);
+    List<UploadPartDTO> getUploadPartList(PartQuery partQuery);
 
     /**
      * 合成上传部分
@@ -68,14 +67,6 @@ public interface ObjectService {
      * @return
      */
     Map<String, String> getPresignedFormData(String bucketName, String objectName);
-
-    /**
-     * 创建
-     * @param dto 传输对象
-     * @param inputStream 输入流
-     * @return
-     */
-    void create(ObjectDTO dto, InputStream inputStream);
 
     /**
      * 创建
