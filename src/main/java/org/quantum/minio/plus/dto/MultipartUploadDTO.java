@@ -1,5 +1,6 @@
 package org.quantum.minio.plus.dto;
 
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -33,6 +34,11 @@ public class MultipartUploadDTO {
      * 元数据
      */
     private Map<String, String> metadata;
+
+    /**
+     * 开始时间
+     */
+    private Instant initiated;
 
     public String getBucketName() {
         return bucketName;
@@ -72,5 +78,13 @@ public class MultipartUploadDTO {
 
     public void setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
+    }
+
+    public Instant getInitiated() {
+        return initiated;
+    }
+
+    public void setInitiated(Instant initiated) {
+        this.initiated = initiated;
     }
 }

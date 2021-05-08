@@ -85,7 +85,6 @@ public class ObjectServiceImpl implements ObjectService {
                 .bucket(inputDto.getBucketName())
                 .key(inputDto.getKey())
                 .metadata(inputDto.getMetadata())
-                .tagging(Tagging.builder().build())
                 .build());
 
         MultipartUploadDTO dto = new MultipartUploadDTO();
@@ -107,6 +106,8 @@ public class ObjectServiceImpl implements ObjectService {
             MultipartUploadDTO dto = new MultipartUploadDTO();
             dto.setKey(multipartUpload.key());
             dto.setUploadId(multipartUpload.uploadId());
+            dto.setStorageClass(multipartUpload.storageClassAsString());
+            dto.setInitiated(multipartUpload.initiated());
             dtos.add(dto);
         });
         return dtos;

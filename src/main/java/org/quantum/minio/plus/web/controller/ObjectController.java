@@ -47,7 +47,7 @@ public class ObjectController {
      * @param bucketName
      * @return
      */
-    @GetMapping("/upload/multipart/list")
+    @GetMapping("/multipart-upload/list")
     public MultiResponse<MultipartUploadDTO> getMultipartUploadList(@RequestParam String bucketName){
         List<MultipartUploadDTO> dtos = objectService.getMultipartUploadList(bucketName);
         return MultiResponse.of(dtos);
