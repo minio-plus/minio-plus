@@ -1,5 +1,7 @@
 package org.quantum.minio.plus.dto;
 
+import java.util.Map;
+
 /**
  * 多部分上传 传输对象
  * @author ike
@@ -26,6 +28,11 @@ public class MultipartUploadDTO {
      * 存储类
      */
     private String storageClass;
+
+    /**
+     * 元数据
+     */
+    private Map<String, String> metadata;
 
     public String getBucketName() {
         return bucketName;
@@ -57,5 +64,13 @@ public class MultipartUploadDTO {
 
     public void setStorageClass(String storageClass) {
         this.storageClass = storageClass;
+    }
+
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 }

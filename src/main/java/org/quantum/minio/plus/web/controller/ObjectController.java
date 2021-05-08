@@ -87,32 +87,38 @@ public class ObjectController {
     }
 
     /**
-     * 获取签名表单数据
-     * @param bucketName
-     * @param objectName
+     * 获取预签名上传部分URL
+     * @param dto
      * @return
      */
-    @GetMapping("/presigned/formdata")
-    public SingleResponse<Map<String, String>> getPresignedFormData(
-            @RequestParam String bucketName,
-            @RequestParam String objectName){
-        Map<String, String> map = objectService.getPresignedFormData(bucketName, objectName);
-        return SingleResponse.of(map);
+    @GetMapping("/presigned/url/uploadpart")
+    public SingleResponse<String> getPresignUploadPartUrl(UploadPartDTO dto) {
+        String url = objectService.getPresignUploadPartUrl(dto);
+        return SingleResponse.of(url);
     }
 
     /**
      * 获取签名Url
      * @param bucketName
      * @param objectName
-     * @param method
      * @return
      */
     @GetMapping("/presigned/url")
     public SingleResponse<String> getPresignedUrl(
             @RequestParam String bucketName,
-            @RequestParam String objectName,
-            @RequestParam String method) {
-        String url = objectService.getPresignedUrl(bucketName, objectName, method);
+            @RequestParam String objectName) {
+        String url = objectService.getPresignedUrl(bucketName, objectName);
+        return SingleResponse.of(url);
+    }
+
+    /**
+     * 获取签名Url
+     * @param dto
+     * @return
+     */
+    @PutMapping("/presigned/url")
+    public SingleResponse<String> getPresignedUrl(@RequestBody ObjectDTO dto) {
+        String url = objectService.getPresignedUrl(dto);
         return SingleResponse.of(url);
     }
 

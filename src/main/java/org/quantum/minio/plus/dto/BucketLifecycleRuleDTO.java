@@ -1,5 +1,6 @@
 package org.quantum.minio.plus.dto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class BucketLifecycleRuleDTO {
     /**
      * 日期
      */
-    private ZonedDateTime date;
+    private Instant date;
 
     public String getId() {
         return id;
@@ -107,11 +108,11 @@ public class BucketLifecycleRuleDTO {
         this.days = days;
     }
 
-    public ZonedDateTime getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(ZonedDateTime date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 }

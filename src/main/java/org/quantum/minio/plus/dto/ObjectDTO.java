@@ -1,5 +1,6 @@
 package org.quantum.minio.plus.dto;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class ObjectDTO {
     /**
      * 最后更新时间
      */
-    private ZonedDateTime lastModified;
+    private Instant lastModified;
 
     /**
      * 存储类
@@ -54,7 +55,7 @@ public class ObjectDTO {
     /**
      * 用户元数据
      */
-    private Map<String, String> userMetaData;
+    private Map<String, String> metadata;
 
     /**
      * 前缀列表
@@ -77,11 +78,11 @@ public class ObjectDTO {
         this.objectName = objectName;
     }
 
-    public ZonedDateTime getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(ZonedDateTime lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -125,12 +126,12 @@ public class ObjectDTO {
         isDir = dir;
     }
 
-    public Map<String, String> getUserMetaData() {
-        return userMetaData;
+    public Map<String, String> getMetadata() {
+        return metadata;
     }
 
-    public void setUserMetaData(Map<String, String> userMetaData) {
-        this.userMetaData = userMetaData;
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 
     public List<String> getPrefixs() {

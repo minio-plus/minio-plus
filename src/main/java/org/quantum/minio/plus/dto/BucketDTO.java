@@ -1,5 +1,6 @@
 package org.quantum.minio.plus.dto;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public class BucketDTO {
 
     private Map<String, String> tags;
 
-    private ZonedDateTime creationDate;
+    private Instant creationDate;
 
     public String getName() {
         return name;
@@ -32,11 +33,11 @@ public class BucketDTO {
         this.tags = tags;
     }
 
-    public ZonedDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(ZonedDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 }

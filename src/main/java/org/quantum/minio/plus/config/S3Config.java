@@ -1,15 +1,15 @@
 package org.quantum.minio.plus.config;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author ike
@@ -28,19 +28,22 @@ public class S3Config {
     private String secretKey;
 
     @Bean
-    public AmazonS3 s3Client(){
-        AmazonS3 amazonS3 = new AmazonS3Client(new AWSCredentialsProvider() {
-            @Override
-            public AWSCredentials getCredentials() {
-                return new BasicAWSCredentials(accessKey, secretKey);
-            }
+    public S3Client s3Client() throws URISyntaxException {
+        S3Client s3Client = S3Client.builder()
+                .credentialsProvider(() ->  AwsBasicCredentials.create(accessKey, secretKey))
+                .endpointOverride(new URI(this.endpoint))
+                .region(Region.US_WEST_1)
+                .build();
+        return s3Client;
+    }
 
-            @Override
-            public void refresh() {
-
-            }
-        });
-        amazonS3.setEndpoint(this.endpoint);
-        return amazonS3;
+    @Bean
+    public S3Presigner s3Presigner() throws URISyntaxException {
+        S3Presigner s3Presigner = S3Presigner.builder()
+                .credentialsProvider(() -> AwsBasicCredentials.create(accessKey, secretKey))
+                .endpointOverride(new URI(this.endpoint))
+                .region(Region.US_WEST_1)
+                .build();
+        return s3Presigner;
     }
 }

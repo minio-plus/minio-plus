@@ -12,6 +12,12 @@ public class UploadPartDTO {
 
     private Long Size;
 
+    private String bucketName;
+
+    private String key;
+
+    private String uploadId;
+
     public String getETag() {
         return eTag;
     }
@@ -34,5 +40,29 @@ public class UploadPartDTO {
 
     public void setSize(Long size) {
         Size = size;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getUploadId() {
+        return uploadId;
+    }
+
+    public void setUploadId(String uploadId) {
+        this.uploadId = uploadId;
     }
 }

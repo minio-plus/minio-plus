@@ -55,18 +55,23 @@ public interface ObjectService {
      * 获取预签名
      * @param bucketName 桶名称
      * @param objectName 对象名称
-     * @param method 方式
      * @return
      */
-    String getPresignedUrl(String bucketName, String objectName, String method);
+    String getPresignedUrl(String bucketName, String objectName);
 
     /**
-     * 获取预签名表单数据
-     * @param bucketName
-     * @param objectName
+     * 获取预签名
+     * @param dto 传输对象
      * @return
      */
-    Map<String, String> getPresignedFormData(String bucketName, String objectName);
+    String getPresignedUrl(ObjectDTO dto);
+
+    /**
+     * 获取预签名上传部分URL
+     * @param dto
+     * @return
+     */
+    String getPresignUploadPartUrl(UploadPartDTO dto);
 
     /**
      * 创建
@@ -74,15 +79,6 @@ public interface ObjectService {
      * @return
      */
     void create(ObjectDTO dto);
-
-    /**
-     * 合并
-     * @param bucketName
-     * @param objectName
-     * @param parts
-     * @return
-     */
-    String compose(String bucketName, String objectName, List<String> parts);
 
 
     /**

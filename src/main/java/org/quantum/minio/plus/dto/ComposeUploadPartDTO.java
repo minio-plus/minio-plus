@@ -1,7 +1,5 @@
 package org.quantum.minio.plus.dto;
 
-import com.amazonaws.services.s3.model.PartETag;
-
 import java.util.List;
 
 /**
