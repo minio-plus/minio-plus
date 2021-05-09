@@ -11,7 +11,10 @@ public class ObjectQuery {
 
     private String bucketName;
 
+    private String key;
+
     private List<String> prefixs;
+
 
     public String getBucketName() {
         return bucketName;
@@ -19,6 +22,14 @@ public class ObjectQuery {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public List<String> getPrefixs() {

@@ -32,7 +32,6 @@ public class BucketServiceImpl implements BucketService {
 
     @Override
     public List<BucketDTO> getList() {
-
         List<BucketDTO> dtos = new ArrayList<>();
 
         ListBucketsResponse response = s3Client.listBuckets();

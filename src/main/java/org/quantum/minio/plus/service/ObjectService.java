@@ -1,14 +1,9 @@
 package org.quantum.minio.plus.service;
 
-import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
-import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.ObjectDTO;
-import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
-import org.quantum.minio.plus.dto.query.PartQuery;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author ike
@@ -24,56 +19,6 @@ public interface ObjectService {
     List<ObjectDTO> getList(ObjectQuery query);
 
     /**
-     * 初始化多部分上传
-     * @param inputDto 输入传输对象
-     * @return
-     */
-    MultipartUploadDTO initiateMultipartUpload(MultipartUploadDTO inputDto);
-
-    /**
-     * 获取多部分上传列表
-     * @param bucketName
-     * @return
-     */
-    List<MultipartUploadDTO> getMultipartUploadList(String bucketName);
-
-    /**
-     * 获取上传部分列表
-     * @param partQuery 部分查询
-     * @return
-     */
-    List<UploadPartDTO> getUploadPartList(PartQuery partQuery);
-
-    /**
-     * 合成上传部分
-     * @param dto 传输对象
-     * @return
-     */
-    String composeUploadPart(ComposeUploadPartDTO dto);
-
-    /**
-     * 获取预签名
-     * @param bucketName 桶名称
-     * @param objectName 对象名称
-     * @return
-     */
-    String getPresignedUrl(String bucketName, String objectName);
-
-    /**
-     * 获取预签名
-     * @param dto 传输对象
-     * @return
-     */
-    String getPresignedUrl(ObjectDTO dto);
-
-    /**
-     * 获取预签名上传部分URL
-     * @param dto
-     * @return
-     */
-    String getPresignUploadPartUrl(UploadPartDTO dto);
-
-    /**
      * 创建
      * @param dto 传输对象
      * @return
@@ -83,6 +28,7 @@ public interface ObjectService {
 
     /**
      * 删除
+     * @param bucketName
      * @param objectName
      */
     void delete(String bucketName, String objectName);

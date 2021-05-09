@@ -1,11 +1,14 @@
 package org.quantum.minio.plus.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author ike
  * @date 2021 年 05 月 07 日 11:12
  */
 public class UploadPartDTO {
 
+    @JsonProperty("eTag")
     private String eTag;
 
     private Integer partNumber;

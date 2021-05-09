@@ -30,12 +30,9 @@ public class ObjectServiceImpl implements ObjectService {
 
     private S3Client s3Client;
 
-    private S3Presigner s3Presigner;
-
     @Autowired
-    public void setMinioClient(S3Client s3Client, S3Presigner s3Presigner) {
+    public void setMinioClient(S3Client s3Client) {
         this.s3Client = s3Client;
-        this.s3Presigner = s3Presigner;
     }
 
     @Override
@@ -77,122 +74,6 @@ public class ObjectServiceImpl implements ObjectService {
             }
         });
         return dtos;
-    }
-
-    @Override
-    public MultipartUploadDTO initiateMultipartUpload(MultipartUploadDTO inputDto) {
-        CreateMultipartUploadResponse response = s3Client.createMultipartUpload(CreateMultipartUploadRequest.builder()
-                .bucket(inputDto.getBucketName())
-                .key(inputDto.getKey())
-                .metadata(inputDto.getMetadata())
-                .build());
-
-        MultipartUploadDTO dto = new MultipartUploadDTO();
-        dto.setUploadId(response.uploadId());
-        dto.setKey(response.key());
-        return dto;
-    }
-
-    @Override
-    public List<MultipartUploadDTO> getMultipartUploadList(String bucketName) {
-        List<MultipartUploadDTO> dtos = new ArrayList<>();
-
-        ListMultipartUploadsResponse response = s3Client.listMultipartUploads(ListMultipartUploadsRequest.builder()
-                .bucket(bucketName)
-                .build());
-
-        List<MultipartUpload> multipartUploads = response.uploads();
-        multipartUploads.forEach(multipartUpload -> {
-            MultipartUploadDTO dto = new MultipartUploadDTO();
-            dto.setKey(multipartUpload.key());
-            dto.setUploadId(multipartUpload.uploadId());
-            dto.setStorageClass(multipartUpload.storageClassAsString());
-            dto.setInitiated(multipartUpload.initiated());
-            dtos.add(dto);
-        });
-        return dtos;
-    }
-
-    @Override
-    public List<UploadPartDTO> getUploadPartList(PartQuery partQuery) {
-        List<UploadPartDTO> dtos = new ArrayList<>();
-
-        ListPartsResponse response = s3Client.listParts(ListPartsRequest.builder()
-                .bucket(partQuery.getBucketName())
-                .key(partQuery.getKey())
-                .uploadId(partQuery.getUploadId())
-                .build());
-
-        List<Part> partSummaries = response.parts();
-        partSummaries.forEach(part -> {
-            UploadPartDTO dto = new UploadPartDTO();
-            dto.setETag(part.eTag());
-            dto.setSize(part.size());
-            dto.setPartNumber(part.partNumber());
-            dtos.add(dto);
-        });
-        return dtos;
-    }
-
-    @Override
-    public String composeUploadPart(ComposeUploadPartDTO dto) {
-        s3Client.completeMultipartUpload(CompleteMultipartUploadRequest.builder()
-                .bucket(dto.getBucketName())
-                .key(dto.getKey())
-                .uploadId(dto.getUploadId())
-                .build());
-        return this.getPresignedUrl(dto.getBucketName(), dto.getKey());
-    }
-
-    @Override
-    public String getPresignedUrl(String bucketName, String key) {
-        GetObjectRequest getObjectRequest =
-                GetObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .build();
-
-        GetObjectPresignRequest getObjectPresignRequest =
-                GetObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofMinutes(10))
-                        .getObjectRequest(getObjectRequest)
-                        .build();
-
-        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
-        return presignedGetObjectRequest.url().toString();
-    }
-
-    @Override
-    public String getPresignedUrl(ObjectDTO dto) {
-        PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(dto.getObjectName())
-                .key(dto.getObjectName())
-                .contentType("text/plain")
-                .metadata(dto.getMetadata())
-                .build();
-
-        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
-                .putObjectRequest(objectRequest)
-                .build();
-
-        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
-        return presignedRequest.url().toString();
-    }
-
-    @Override
-    public String getPresignUploadPartUrl(UploadPartDTO dto) {
-        UploadPartPresignRequest request = UploadPartPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5))
-                .uploadPartRequest(UploadPartRequest.builder()
-                        .bucket(dto.getBucketName())
-                        .key(dto.getKey())
-                        .partNumber(dto.getPartNumber())
-                        .uploadId(dto.getUploadId())
-                        .build())
-                .build();
-        PresignedUploadPartRequest presignedRequest = s3Presigner.presignUploadPart(request);
-        return presignedRequest.url().toString();
     }
 
     @Override

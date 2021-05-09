@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author ike
@@ -40,86 +39,6 @@ public class ObjectController {
     public MultiResponse<ObjectDTO> getList(@RequestBody ObjectQuery query) {
         List<ObjectDTO> dtos = objectService.getList(query);
         return MultiResponse.of(dtos);
-    }
-
-    /**
-     * 多部分上传列表
-     * @param bucketName
-     * @return
-     */
-    @GetMapping("/multipart-upload/list")
-    public MultiResponse<MultipartUploadDTO> getMultipartUploadList(@RequestParam String bucketName){
-        List<MultipartUploadDTO> dtos = objectService.getMultipartUploadList(bucketName);
-        return MultiResponse.of(dtos);
-    }
-
-    /**
-     * 获取上传部分
-     * @param query 查询
-     * @return
-     */
-    @GetMapping("/upload/part/list")
-    public MultiResponse<UploadPartDTO> getUploadPartList(PartQuery query) {
-        List<UploadPartDTO> dtos = objectService.getUploadPartList(query);
-        return MultiResponse.of(dtos);
-    }
-
-    /**
-     * 初始化多部分上传
-     * @param inputDto 输入传输对象
-     * @return
-     */
-    @PostMapping("/upload/multipart/initiate")
-    public SingleResponse<MultipartUploadDTO> initiateMultipartUpload(@RequestBody MultipartUploadDTO inputDto){
-        MultipartUploadDTO outDto = objectService.initiateMultipartUpload(inputDto);
-        return SingleResponse.of(outDto);
-    }
-
-    /**
-     * 上传部分合成
-     * @param dto
-     * @return
-     */
-    @PostMapping("/upload/part/compose")
-    public SingleResponse<String> composeUploadPart(@RequestBody ComposeUploadPartDTO dto){
-        String location = objectService.composeUploadPart(dto);
-        return SingleResponse.of(location);
-    }
-
-    /**
-     * 获取预签名上传部分URL
-     * @param dto
-     * @return
-     */
-    @GetMapping("/presigned/url/uploadpart")
-    public SingleResponse<String> getPresignUploadPartUrl(UploadPartDTO dto) {
-        String url = objectService.getPresignUploadPartUrl(dto);
-        return SingleResponse.of(url);
-    }
-
-    /**
-     * 获取签名Url
-     * @param bucketName
-     * @param objectName
-     * @return
-     */
-    @GetMapping("/presigned/url")
-    public SingleResponse<String> getPresignedUrl(
-            @RequestParam String bucketName,
-            @RequestParam String objectName) {
-        String url = objectService.getPresignedUrl(bucketName, objectName);
-        return SingleResponse.of(url);
-    }
-
-    /**
-     * 获取签名Url
-     * @param dto
-     * @return
-     */
-    @PutMapping("/presigned/url")
-    public SingleResponse<String> getPresignedUrl(@RequestBody ObjectDTO dto) {
-        String url = objectService.getPresignedUrl(dto);
-        return SingleResponse.of(url);
     }
 
     /**
