@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ * 多部分上传控制器
  * @author ike
  * @date 2021 年 05 月 09 日 17:42
  */
@@ -41,7 +42,7 @@ public class MultipartUploadController {
      * @return
      */
     @PostMapping("/create")
-    public SingleResponse<MultipartUploadDTO> initiateMultipartUpload(@RequestBody MultipartUploadDTO inputDto){
+    public SingleResponse<MultipartUploadDTO> createMultipartUpload(@RequestBody MultipartUploadDTO inputDto){
         MultipartUploadDTO outDto = multipartUploadService.createMultipartUpload(inputDto);
         return SingleResponse.of(outDto);
     }

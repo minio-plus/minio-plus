@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * 用户控制器
  * @author ike
  * @date 2021 年 03 月 30 日 11:47
  */
@@ -16,8 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
 
-    @Autowired
     private UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/login")
     public SingleResponse<AuthDTO> login(@RequestBody UserLoginDTO dto) {

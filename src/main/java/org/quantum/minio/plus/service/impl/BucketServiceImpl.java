@@ -183,7 +183,10 @@ public class BucketServiceImpl implements BucketService {
         LifecycleRuleAndOperator.Builder andOperatorBuilder = LifecycleRuleAndOperator.builder();
         andOperatorBuilder.prefix(prefix);
         if(Objects.nonNull(tags) && tags.size() > 0) {
-            Tag[] tagArray = tags.entrySet().stream().map(d -> Tag.builder().key(d.getKey()).value(d.getValue()).build()).toArray(Tag[]::new);
+            Tag[] tagArray = tags.entrySet().stream().map(d -> Tag.builder()
+                    .key(d.getKey())
+                    .value(d.getValue()).build()
+            ).toArray(Tag[]::new);
             andOperatorBuilder.tags(tagArray);
         }
         filterBuilder.and(andOperatorBuilder.build());
