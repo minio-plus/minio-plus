@@ -23,6 +23,6 @@ public class ListResponse<T> extends Response {
         ListResponse<T> response = new ListResponse<>();
         response.setCode("ok");
         response.setData(data);
-        return ListResponse.of(data);
+        return response;
     }
 }
