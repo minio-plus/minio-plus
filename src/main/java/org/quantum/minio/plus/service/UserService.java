@@ -1,5 +1,6 @@
 package org.quantum.minio.plus.service;
 
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.dto.AuthDTO;
 import org.quantum.minio.plus.dto.UserLoginDTO;
 
@@ -12,7 +13,7 @@ public interface UserService {
      /**
       * 登录
       * @param dto 传输对象
-      * @return
+      * @return 值响应
       */
-     AuthDTO login(UserLoginDTO dto);
+     ValueResponse<AuthDTO> login(UserLoginDTO dto);
 }

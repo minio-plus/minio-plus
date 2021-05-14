@@ -1,12 +1,11 @@
 package org.quantum.minio.plus.web.controller;
 
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.dto.MultipartUploadDTO;
-import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.PutObjectDTO;
 import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
 import org.quantum.minio.plus.service.PresignService;
-import org.quantum.nucleus.component.dto.SingleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,9 +33,8 @@ public class PresignController {
      * @return
      */
     @GetMapping
-    public SingleResponse<String> getObject(ObjectQuery query) {
-        String url = presignService.getObject(query);
-        return SingleResponse.of(url);
+    public ValueResponse<String> getObject(ObjectQuery query) {
+        return presignService.getObject(query);
     }
 
     /**
@@ -45,9 +43,8 @@ public class PresignController {
      * @return
      */
     @PutMapping
-    public SingleResponse<String> putObject(@RequestBody PutObjectDTO dto) {
-        String url = presignService.putObject(dto);
-        return SingleResponse.of(url);
+    public ValueResponse<String> putObject(@RequestBody PutObjectDTO dto) {
+        return presignService.putObject(dto);
     }
 
     /**
@@ -56,9 +53,8 @@ public class PresignController {
      * @return
      */
     @PostMapping("/multipart/upload/complete")
-    public SingleResponse<String> getCompleteMultipartUpload(@RequestBody MultipartUploadDTO dto){
-        String location = presignService.completeMultipartUpload(dto);
-        return SingleResponse.of(location);
+    public ValueResponse<String> getCompleteMultipartUpload(@RequestBody MultipartUploadDTO dto){
+        return presignService.completeMultipartUpload(dto);
     }
 
     /**
@@ -67,9 +63,8 @@ public class PresignController {
      * @return
      */
     @GetMapping("/multipart/upload/abort")
-    public SingleResponse<String> getAbortMultipartUpload(MultipartUploadDTO dto) {
-        String url = presignService.abortMultipartUpload(dto);
-        return SingleResponse.of(url);
+    public ValueResponse<String> getAbortMultipartUpload(MultipartUploadDTO dto) {
+        return presignService.abortMultipartUpload(dto);
     }
 
     /**
@@ -78,8 +73,7 @@ public class PresignController {
      * @return
      */
     @GetMapping("/upload/part")
-    public SingleResponse<String> getUploadPart(UploadPartDTO dto) {
-        String url = presignService.uploadPart(dto);
-        return SingleResponse.of(url);
+    public ValueResponse<String> getUploadPart(UploadPartDTO dto) {
+        return presignService.uploadPart(dto);
     }
 }

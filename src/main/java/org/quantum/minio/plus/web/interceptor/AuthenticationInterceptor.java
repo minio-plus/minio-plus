@@ -3,11 +3,11 @@ package org.quantum.minio.plus.web.interceptor;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.commons.lang3.StringUtils;
-import org.quantum.minio.plus.Constant;
-import org.quantum.minio.plus.web.common.FailResponseStatus;
+import org.quantum.minio.plus.Response;
+import org.quantum.minio.plus.ServiceExceptionState;
+import org.quantum.minio.plus.constant.Constant;
 import org.quantum.minio.plus.web.annotation.OpenMapping;
 import org.quantum.minio.plus.web.context.UserContextHolder;
-import org.quantum.nucleus.component.dto.Response;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -25,7 +25,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) throws IOException {
         response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html;charset=utf-8");
+        response.setContentType("application/json;charset=utf-8");
 
         if (!(object instanceof HandlerMethod)) {
             return true;
@@ -45,7 +45,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         }
 
         if (StringUtils.isEmpty(token)) {
-            response.getWriter().print(Response.buildFailure(FailResponseStatus.UNAUTHORIZED).toJSONString());
+            response.getWriter().print(Response.of(ServiceExceptionState.UNAUTHORIZED));
             return false;
         }
 
@@ -53,13 +53,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         String userId = decodedJWT.getId();
         if (userId == null) {
-            response.getWriter().print(Response.buildFailure(FailResponseStatus.UNAUTHORIZED).toJSONString());
+            response.getWriter().print(Response.of(ServiceExceptionState.UNAUTHORIZED));
             return false;
         }
 
         Date date = new Date();
         if(decodedJWT.getExpiresAt().getTime() > date.getTime()){
-            response.getWriter().print(Response.buildFailure(FailResponseStatus.UNAUTHORIZED).toJSONString());
+            response.getWriter().print(Response.of(ServiceExceptionState.UNAUTHORIZED));
         }
 
         UserContextHolder.set(userId);

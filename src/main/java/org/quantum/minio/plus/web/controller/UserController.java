@@ -1,10 +1,11 @@
 package org.quantum.minio.plus.web.controller;
 
+import org.quantum.minio.plus.Response;
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.web.vo.UserPublicInfoVO;
 import org.quantum.minio.plus.dto.AuthDTO;
 import org.quantum.minio.plus.dto.UserLoginDTO;
 import org.quantum.minio.plus.service.UserService;
-import org.quantum.nucleus.component.dto.SingleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,22 +26,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public SingleResponse<AuthDTO> login(@RequestBody UserLoginDTO dto) {
-        AuthDTO authDto = userService.login(dto);
-        return SingleResponse.of(authDto);
+    public ValueResponse<AuthDTO> login(@RequestBody UserLoginDTO dto) {
+        return userService.login(dto);
     }
 
     @GetMapping("/current")
-    public SingleResponse<UserPublicInfoVO> getCurrentInfo() {
+    public ValueResponse<UserPublicInfoVO> getCurrentInfo() {
         UserPublicInfoVO vo = new UserPublicInfoVO();
         vo.setUsername("admin");
         vo.setAvatar("https://i.gtimg.cn/club/item/face/img/2/15922_100.gif");
         vo.setPermissions(new String[]{"admin", "editor"});
-        return SingleResponse.of(vo);
+        return ValueResponse.of(vo);
     }
 
     @GetMapping("/logout")
-    public SingleResponse logout(){
-        return SingleResponse.buildSuccess();
+    public Response logout(){
+        return Response.ok();
     }
 }

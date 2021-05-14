@@ -1,9 +1,9 @@
 package org.quantum.minio.plus.service;
 
+import org.quantum.minio.plus.ListResponse;
+import org.quantum.minio.plus.Response;
 import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
-
-import java.util.List;
 
 /**
  * @author ike
@@ -16,14 +16,14 @@ public interface ObjectService {
      * @param query 查询
      * @return
      */
-    List<ObjectDTO> getList(ObjectQuery query);
+    ListResponse<ObjectDTO> getList(ObjectQuery query);
 
     /**
      * 创建
      * @param dto 传输对象
      * @return
      */
-    void create(ObjectDTO dto);
+    Response create(ObjectDTO dto);
 
 
     /**
@@ -31,5 +31,5 @@ public interface ObjectService {
      * @param bucketName
      * @param objectName
      */
-    void delete(String bucketName, String objectName);
+    Response delete(String bucketName, String objectName);
 }

@@ -1,16 +1,16 @@
 package org.quantum.minio.plus.web.controller;
 
+import org.quantum.minio.plus.ListResponse;
+import org.quantum.minio.plus.Response;
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.dto.BucketDTO;
 import org.quantum.minio.plus.dto.BucketLifecycleRuleDTO;
-import org.quantum.minio.plus.dto.LifecycleCreateDTO;
 import org.quantum.minio.plus.dto.query.BucketLifecycleConfigurationQuery;
 import org.quantum.minio.plus.service.BucketService;
-import org.quantum.nucleus.component.dto.MultiResponse;
-import org.quantum.nucleus.component.dto.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
 
 /**
  * @author ike
@@ -28,51 +28,42 @@ public class BucketController {
     }
 
     @GetMapping("/list")
-    public MultiResponse<BucketDTO> getList() {
-        List<BucketDTO> dtos = bucketService.getList();
-        return MultiResponse.of(dtos);
+    public ListResponse<BucketDTO> getList() {
+        return bucketService.getList();
     }
 
     @PostMapping
-    public Response create(@RequestBody BucketDTO dto){
-        bucketService.create(dto);
-        return Response.buildSuccess();
+    public Response create(@Valid @RequestBody BucketDTO dto) {
+        return bucketService.create(dto);
     }
 
     @DeleteMapping
-    public Response delete(@RequestParam String name){
-        bucketService.remove(name);
-        return Response.buildSuccess();
+    public Response delete(@RequestParam String name) {
+        return bucketService.remove(name);
+    }
+
+    @GetMapping("/policy")
+    public ValueResponse<String> getPolicy(@RequestParam String bucket){
+        return bucketService.getPolicy(bucket);
     }
 
     @GetMapping("/lifecycle/rule/list")
-    public MultiResponse<BucketLifecycleRuleDTO> getLifecycleRuleList(BucketLifecycleConfigurationQuery query) {
-        List<BucketLifecycleRuleDTO> lifecycleRuleDtos = bucketService.getLifecycleRuleList(query);
-        return MultiResponse.of(lifecycleRuleDtos);
+    public ListResponse<BucketLifecycleRuleDTO> getLifecycleRuleList(@Valid BucketLifecycleConfigurationQuery query) {
+        return bucketService.getLifecycleRuleList(query);
     }
 
     @PostMapping("/lifecycle/rule")
     public Response creareLifecycleRule(@RequestBody BucketLifecycleRuleDTO dto) {
-        bucketService.createLifecycleRule(dto);
-        return Response.buildSuccess();
+        return bucketService.createLifecycleRule(dto);
     }
 
     @PutMapping("/lifecycle/rule")
     public Response updateLifecycleRule(@RequestBody BucketLifecycleRuleDTO dto) {
-        return Response.buildSuccess();
+        return Response.ok();
     }
 
     @DeleteMapping("/lifecycle/rule")
     public Response deleteLifecycleRule(@RequestParam("bucketName") String bucketName, @RequestParam("id") String id) {
-        bucketService.deleteLifecycleRule(bucketName, id);
-        return Response.buildSuccess();
-    }
-
-    @PostMapping("/compose")
-    public Response compose(
-            @RequestBody String bucketName,
-            List<String> parts
-    ){
-        return Response.buildSuccess();
+        return bucketService.deleteLifecycleRule(bucketName, id);
     }
 }

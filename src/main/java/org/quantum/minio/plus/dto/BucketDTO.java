@@ -1,7 +1,7 @@
 package org.quantum.minio.plus.dto;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public class BucketDTO {
 
+    @NotEmpty
     private String name;
 
     private Map<String, String> tags;

@@ -1,8 +1,7 @@
 package org.quantum.minio.plus.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.quantum.minio.plus.BizException;
-import org.quantum.minio.plus.BizExceptionState;
+import org.quantum.minio.plus.*;
 import org.quantum.minio.plus.constant.CleanStrategy;
 import org.quantum.minio.plus.dto.BucketDTO;
 import org.quantum.minio.plus.dto.BucketLifecycleRuleDTO;
@@ -31,7 +30,7 @@ public class BucketServiceImpl implements BucketService {
     }
 
     @Override
-    public List<BucketDTO> getList() {
+    public ListResponse<BucketDTO> getList() {
         List<BucketDTO> dtos = new ArrayList<>();
 
         ListBucketsResponse response = s3Client.listBuckets();
@@ -42,27 +41,38 @@ public class BucketServiceImpl implements BucketService {
             dto.setCreationDate(bucket.creationDate());
             dtos.add(dto);
         });
-        return dtos;
+        return ListResponse.of(dtos);
     }
 
     @Override
-    public void create(BucketDTO dto) {
+    public ValueResponse<String> getPolicy(String bucket) {
+        GetBucketPolicyRequest request= GetBucketPolicyRequest.builder()
+                .bucket(bucket)
+                .build();
+        GetBucketPolicyResponse response = s3Client.getBucketPolicy(request);
+        return ValueResponse.of(response.policy());
+    }
+
+    @Override
+    public Response create(BucketDTO dto) {
         CreateBucketRequest request = CreateBucketRequest.builder()
                 .bucket(dto.getName())
                 .build();
         s3Client.createBucket(request);
+        return Response.ok();
     }
 
     @Override
-    public void remove(String name) {
+    public Response remove(String name) {
         DeleteBucketRequest request = DeleteBucketRequest.builder()
                 .bucket(name)
                 .build();
         s3Client.deleteBucket(request);
+        return Response.ok();
     }
 
     @Override
-    public List<BucketLifecycleRuleDTO> getLifecycleRuleList(BucketLifecycleConfigurationQuery lifecycleConfigurationQuery) {
+    public ListResponse<BucketLifecycleRuleDTO> getLifecycleRuleList(BucketLifecycleConfigurationQuery lifecycleConfigurationQuery) {
         List<BucketLifecycleRuleDTO> dtos = new ArrayList<>();
 
         try {
@@ -93,23 +103,23 @@ public class BucketServiceImpl implements BucketService {
                 dtos.add(lifecycleRuleDto);
             });
         } catch (S3Exception e) {
-            return dtos;
+            return ListResponse.of(dtos);
         }
-        return dtos;
+        return ListResponse.of(dtos);
     }
 
     @Override
-    public void createLifecycleRule(BucketLifecycleRuleDTO lifecycleRuleDto) {
+    public Response createLifecycleRule(BucketLifecycleRuleDTO lifecycleRuleDto) {
         try{
             GetBucketLifecycleConfigurationResponse response = s3Client.getBucketLifecycleConfiguration(GetBucketLifecycleConfigurationRequest.builder()
                     .bucket(lifecycleRuleDto.getBucketName())
                     .build());
             if(StringUtils.isEmpty(lifecycleRuleDto.getPrefix()) && response.rules().size() > 0) {
-                throw new BizException(BizExceptionState.PARAMETER_ERROR);
+                throw new ServiceException(ServiceExceptionState.BAD_PARAMETER);
             }
         }catch (S3Exception e){
 
-        }catch (BizException e){
+        }catch (ServiceException e){
             e.printStackTrace();
         }
 
@@ -136,11 +146,11 @@ public class BucketServiceImpl implements BucketService {
                 .build();
 
         s3Client.putBucketLifecycleConfiguration(request);
-
+        return Response.ok();
     }
 
     @Override
-    public void deleteLifecycleRule(String bucketName, String id) {
+    public Response deleteLifecycleRule(String bucketName, String id) {
         GetBucketLifecycleConfigurationResponse getResponse = s3Client.getBucketLifecycleConfiguration(GetBucketLifecycleConfigurationRequest.builder()
                 .bucket(bucketName)
                 .build());
@@ -152,7 +162,7 @@ public class BucketServiceImpl implements BucketService {
             s3Client.deleteBucketLifecycle(DeleteBucketLifecycleRequest.builder()
                     .bucket(bucketName)
                     .build());
-            return;
+            return Response.ok();
         }
         // 根据标识删除
         rules.removeIf(lifecycleRule -> lifecycleRule.id().equals(id));
@@ -164,6 +174,7 @@ public class BucketServiceImpl implements BucketService {
                         .rules(rules)
                         .build())
                 .build());
+        return Response.ok();
     }
 
     public ExpirationStatus toStatus(String statusString){
@@ -201,7 +212,7 @@ public class BucketServiceImpl implements BucketService {
         }else if(CleanStrategy.EXPIRATION_DAYS.toString().equals(cleanStrategy)){
             expirationBuilder.days(days);
         }else{
-            throw new BizException(BizExceptionState.PARAMETER_ERROR);
+            throw new ServiceException(ServiceExceptionState.BAD_PARAMETER);
         }
         return expirationBuilder.build();
     }

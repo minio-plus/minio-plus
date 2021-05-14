@@ -1,9 +1,9 @@
 package org.quantum.minio.plus.web.controller;
 
+import org.quantum.minio.plus.ListResponse;
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.service.MultipartUploadService;
-import org.quantum.nucleus.component.dto.MultiResponse;
-import org.quantum.nucleus.component.dto.SingleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,9 +31,8 @@ public class MultipartUploadController {
      * @return
      */
     @GetMapping("/list")
-    public MultiResponse<MultipartUploadDTO> getMultipartUploadList(@RequestParam String bucketName){
-        List<MultipartUploadDTO> dtos = multipartUploadService.getMultipartUploadList(bucketName);
-        return MultiResponse.of(dtos);
+    public ListResponse<MultipartUploadDTO> getMultipartUploadList(@RequestParam String bucketName){
+        return multipartUploadService.getMultipartUploadList(bucketName);
     }
 
     /**
@@ -42,9 +41,8 @@ public class MultipartUploadController {
      * @return
      */
     @PostMapping("/create")
-    public SingleResponse<MultipartUploadDTO> createMultipartUpload(@RequestBody MultipartUploadDTO inputDto){
-        MultipartUploadDTO outDto = multipartUploadService.createMultipartUpload(inputDto);
-        return SingleResponse.of(outDto);
+    public ValueResponse<MultipartUploadDTO> createMultipartUpload(@RequestBody MultipartUploadDTO inputDto) {
+        return multipartUploadService.createMultipartUpload(inputDto);
     }
 
     /**
@@ -53,8 +51,7 @@ public class MultipartUploadController {
      * @return
      */
     @PostMapping("/complete")
-    public SingleResponse<String> completeMultipartUpload(@RequestBody MultipartUploadDTO inputDto){
-        String location = multipartUploadService.completeMultipartUpload(inputDto);
-        return SingleResponse.of(location);
+    public ValueResponse<String> completeMultipartUpload(@RequestBody MultipartUploadDTO inputDto){
+        return multipartUploadService.completeMultipartUpload(inputDto);
     }
 }

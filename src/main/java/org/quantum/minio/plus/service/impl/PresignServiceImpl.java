@@ -1,21 +1,19 @@
 package org.quantum.minio.plus.service.impl;
 
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.dto.MultipartUploadDTO;
-import org.quantum.minio.plus.dto.ObjectDTO;
 import org.quantum.minio.plus.dto.PutObjectDTO;
 import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
-import org.quantum.minio.plus.service.MultipartUploadService;
+import org.quantum.minio.plus.manager.MultipartUploadManager;
 import org.quantum.minio.plus.service.PresignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.*;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,16 +25,16 @@ public class PresignServiceImpl implements PresignService {
 
     private S3Presigner s3Presigner;
 
-    private MultipartUploadService multipartUploadService;
+    private MultipartUploadManager multipartUploadManager;
 
     @Autowired
-    public void setMinioClient(S3Presigner s3Presigner, MultipartUploadService multipartUploadService) {
+    public void setMinioClient(S3Presigner s3Presigner, MultipartUploadManager multipartUploadManager) {
         this.s3Presigner = s3Presigner;
-        this.multipartUploadService = multipartUploadService;
+        this.multipartUploadManager = multipartUploadManager;
     }
 
     @Override
-    public String getObject(ObjectQuery query) {
+    public ValueResponse<String> getObject(ObjectQuery query) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                         .bucket(query.getBucketName())
                         .key(query.getKey())
@@ -49,11 +47,11 @@ public class PresignServiceImpl implements PresignService {
                         .build();
 
         PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
-        return presignedGetObjectRequest.url().toString();
+        return ValueResponse.of(presignedGetObjectRequest.url().toString());
     }
 
     @Override
-    public String putObject(PutObjectDTO dto) {
+    public ValueResponse<String> putObject(PutObjectDTO dto) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(dto.getBucketName())
                 .key(dto.getObjectName())
@@ -67,11 +65,11 @@ public class PresignServiceImpl implements PresignService {
                 .build();
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
-        return presignedRequest.url().toString();
+        return ValueResponse.of(presignedRequest.url().toString());
     }
 
     @Override
-    public String uploadPart(UploadPartDTO dto) {
+    public ValueResponse<String> uploadPart(UploadPartDTO dto) {
         UploadPartPresignRequest request = UploadPartPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(5))
                 .uploadPartRequest(UploadPartRequest.builder()
@@ -82,11 +80,11 @@ public class PresignServiceImpl implements PresignService {
                         .build())
                 .build();
         PresignedUploadPartRequest presignedRequest = s3Presigner.presignUploadPart(request);
-        return presignedRequest.url().toString();
+        return ValueResponse.of(presignedRequest.url().toString());
     }
 
     @Override
-    public String abortMultipartUpload(MultipartUploadDTO dto) {
+    public ValueResponse<String> abortMultipartUpload(MultipartUploadDTO dto) {
         AbortMultipartUploadPresignRequest abortMultipartUploadPresignRequest = AbortMultipartUploadPresignRequest.builder()
                 .abortMultipartUploadRequest(AbortMultipartUploadRequest.builder()
                         .bucket(dto.getBucketName())
@@ -96,12 +94,12 @@ public class PresignServiceImpl implements PresignService {
                 .signatureDuration(Duration.ofMinutes(5))
                 .build();
         PresignedAbortMultipartUploadRequest request = s3Presigner.presignAbortMultipartUpload(abortMultipartUploadPresignRequest);
-        return request.url().toString();
+        return ValueResponse.of(request.url().toString());
     }
 
     @Override
-    public String completeMultipartUpload(MultipartUploadDTO dto) {
-        List<CompletedPart> completedParts = multipartUploadService.toCompletedPartList(dto.getParts());
+    public ValueResponse<String> completeMultipartUpload(MultipartUploadDTO dto) {
+        List<CompletedPart> completedParts = multipartUploadManager.toCompletedPartList(dto.getParts());
 
         CompleteMultipartUploadPresignRequest completeRequest = CompleteMultipartUploadPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(5))
@@ -115,6 +113,6 @@ public class PresignServiceImpl implements PresignService {
                         .build())
                 .build();
         PresignedCompleteMultipartUploadRequest request = s3Presigner.presignCompleteMultipartUpload(completeRequest);
-        return request.url().toString();
+        return ValueResponse.of(request.url().toString());
     }
 }

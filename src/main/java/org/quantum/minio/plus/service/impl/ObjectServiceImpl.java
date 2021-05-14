@@ -1,21 +1,16 @@
 package org.quantum.minio.plus.service.impl;
 
-import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
-import org.quantum.minio.plus.dto.MultipartUploadDTO;
+import org.quantum.minio.plus.ListResponse;
+import org.quantum.minio.plus.Response;
 import org.quantum.minio.plus.dto.ObjectDTO;
-import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
-import org.quantum.minio.plus.dto.query.PartQuery;
 import org.quantum.minio.plus.service.ObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.*;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +31,7 @@ public class ObjectServiceImpl implements ObjectService {
     }
 
     @Override
-    public List<ObjectDTO> getList(ObjectQuery query) {
+    public ListResponse<ObjectDTO> getList(ObjectQuery query) {
         List<ObjectDTO> dtos = new ArrayList<>();
 
         ListObjectsRequest.Builder request = ListObjectsRequest.builder();
@@ -73,11 +68,11 @@ public class ObjectServiceImpl implements ObjectService {
                 return 0;
             }
         });
-        return dtos;
+        return ListResponse.of(dtos);
     }
 
     @Override
-    public void create(ObjectDTO dto) {
+    public Response create(ObjectDTO dto) {
         String objectName = objectNameHandler(dto);
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(dto.getBucketName())
@@ -85,15 +80,17 @@ public class ObjectServiceImpl implements ObjectService {
                 .metadata(dto.getMetadata())
                 .build();
         s3Client.putObject(request, RequestBody.empty());
+        return Response.ok();
     }
 
     @Override
-    public void delete(String bucketName, String objectName) {
+    public Response delete(String bucketName, String objectName) {
         DeleteObjectRequest request = DeleteObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectName)
                 .build();
         s3Client.deleteObject(request);
+        return Response.ok();
     }
 
     public String objectNameHandler(ObjectDTO dto) {

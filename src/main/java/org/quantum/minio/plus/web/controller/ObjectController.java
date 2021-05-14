@@ -1,19 +1,12 @@
 package org.quantum.minio.plus.web.controller;
 
-import org.quantum.minio.plus.dto.ComposeUploadPartDTO;
-import org.quantum.minio.plus.dto.MultipartUploadDTO;
+import org.quantum.minio.plus.ListResponse;
+import org.quantum.minio.plus.Response;
 import org.quantum.minio.plus.dto.ObjectDTO;
-import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
-import org.quantum.minio.plus.dto.query.PartQuery;
 import org.quantum.minio.plus.service.ObjectService;
-import org.quantum.nucleus.component.dto.MultiResponse;
-import org.quantum.nucleus.component.dto.Response;
-import org.quantum.nucleus.component.dto.SingleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author ike
@@ -36,9 +29,8 @@ public class ObjectController {
      * @return
      */
     @PostMapping("/list")
-    public MultiResponse<ObjectDTO> getList(@RequestBody ObjectQuery query) {
-        List<ObjectDTO> dtos = objectService.getList(query);
-        return MultiResponse.of(dtos);
+    public ListResponse<ObjectDTO> getList(@RequestBody ObjectQuery query) {
+        return objectService.getList(query);
     }
 
     /**
@@ -50,7 +42,7 @@ public class ObjectController {
     public Response createFolder(@RequestBody ObjectDTO dto) {
         dto.setObjectName(String.format("%s/", dto.getObjectName()));
         objectService.create(dto);
-        return Response.buildSuccess();
+        return Response.ok();
     }
 
     /**
@@ -61,7 +53,6 @@ public class ObjectController {
      */
     @DeleteMapping
     public Response delete(@RequestParam String bucketName, @RequestParam String objectName) {
-        objectService.delete(bucketName, objectName);
-        return Response.buildSuccess();
+        return objectService.delete(bucketName, objectName);
     }
 }

@@ -3,6 +3,7 @@ package org.quantum.minio.plus.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.apache.commons.lang3.time.DateUtils;
+import org.quantum.minio.plus.ValueResponse;
 import org.quantum.minio.plus.dto.AuthDTO;
 import org.quantum.minio.plus.dto.UserLoginDTO;
 import org.quantum.minio.plus.service.UserService;
@@ -18,7 +19,7 @@ import java.util.Date;
 public class UserServiceImpl implements UserService {
 
     @Override
-    public AuthDTO login(UserLoginDTO dto) {
+    public ValueResponse<AuthDTO> login(UserLoginDTO dto) {
         Date date = new Date();
         int expiresDays = 7;
         Date expiresAt = DateUtils.addDays(date, expiresDays);
@@ -32,6 +33,6 @@ public class UserServiceImpl implements UserService {
         AuthDTO authDto = new AuthDTO();
         authDto.setAccessToken(accessToken);
         authDto.setExpiresAt(expiresAt.getTime());
-        return authDto;
+        return ValueResponse.of(authDto);
     }
 }
