@@ -47,6 +47,11 @@ public class MultipartUploadDTO {
     private Instant initiated;
 
     /**
+     * 标记
+     */
+    private Map<String, String> tagging;
+
+    /**
      * 部分
      */
     private List<UploadPartDTO> parts;
@@ -105,6 +110,14 @@ public class MultipartUploadDTO {
 
     public void setInitiated(Instant initiated) {
         this.initiated = initiated;
+    }
+
+    public Map<String, String> getTagging() {
+        return tagging;
+    }
+
+    public void setTagging(Map<String, String> tagging) {
+        this.tagging = tagging;
     }
 
     public List<UploadPartDTO> getParts() {

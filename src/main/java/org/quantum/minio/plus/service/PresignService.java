@@ -5,6 +5,7 @@ import org.quantum.minio.plus.dto.MultipartUploadDTO;
 import org.quantum.minio.plus.dto.PutObjectDTO;
 import org.quantum.minio.plus.dto.UploadPartDTO;
 import org.quantum.minio.plus.dto.query.ObjectQuery;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 签名服务
@@ -33,6 +34,13 @@ public interface PresignService {
      * @return
      */
     ValueResponse<String> uploadPart(UploadPartDTO dto);
+
+    /**
+     * 创建多部分上传
+     * @param dto
+     * @return
+     */
+    ValueResponse<String> createMultipartUpload(MultipartUploadDTO dto);
 
     /**
      * 终止多部分上传

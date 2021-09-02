@@ -48,6 +48,16 @@ public class PresignController {
     }
 
     /**
+     * 创建多部分上传
+     * @param dto 输入传输对象
+     * @return
+     */
+    @PostMapping("/multipart/upload/create")
+    public ValueResponse<String> getCreateMultipartUpload(@RequestBody MultipartUploadDTO dto) {
+        return presignService.createMultipartUpload(dto);
+    }
+
+    /**
      * 获取完成多部分上传
      * @param dto
      * @return

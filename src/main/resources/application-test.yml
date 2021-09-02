@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: minio-plus-test
+
+minio:
+  endpoint: http://192.168.233.128:9100
+  accessKey: root
+  secretKey: Dev@123456

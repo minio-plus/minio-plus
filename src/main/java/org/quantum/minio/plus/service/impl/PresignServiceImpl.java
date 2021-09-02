@@ -14,7 +14,10 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author ike
@@ -81,6 +84,43 @@ public class PresignServiceImpl implements PresignService {
                 .build();
         PresignedUploadPartRequest presignedRequest = s3Presigner.presignUploadPart(request);
         return ValueResponse.of(presignedRequest.url().toString());
+    }
+
+    @Override
+    public ValueResponse<String> createMultipartUpload(MultipartUploadDTO dto) {
+        CreateMultipartUploadRequest createMultipartUploadRequest;
+
+        if(Objects.nonNull(dto.getTagging()) && !dto.getTagging().isEmpty()) {
+            List<Tag> tags = dto.getTagging().entrySet().stream().map(entry -> {
+                Tag tag = Tag.builder()
+                        .key(entry.getKey()).value(entry.getValue())
+                        .build();
+                return tag;
+            }).collect(Collectors.toList());
+
+            Tagging tagging = Tagging.builder().tagSet(tags).build();
+            createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
+                    .bucket(dto.getBucketName())
+                    .key(dto.getKey())
+                    .tagging(tagging)
+                    .metadata(dto.getMetadata())
+                    .contentType(dto.getContentType())
+                    .build();
+        }else{
+            createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
+                    .bucket(dto.getBucketName())
+                    .key(dto.getKey())
+                    .metadata(dto.getMetadata())
+                    .contentType(dto.getContentType())
+                    .build();
+        }
+
+        CreateMultipartUploadPresignRequest createMultipartUploadPresignRequest = CreateMultipartUploadPresignRequest.builder()
+                .createMultipartUploadRequest(createMultipartUploadRequest)
+                .signatureDuration(Duration.ZERO)
+                .build();
+        PresignedCreateMultipartUploadRequest presignedCreateMultipartUploadRequest = s3Presigner.presignCreateMultipartUpload(createMultipartUploadPresignRequest);
+        return ValueResponse.of(presignedCreateMultipartUploadRequest.url().toString());
     }
 
     @Override

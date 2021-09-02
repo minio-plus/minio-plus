@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: minio-plus-prod
+
+minio:
+  endpoint: http://47.112.226.124:9100
+  accessKey: minioadmin
+  secretKey: minioadmin

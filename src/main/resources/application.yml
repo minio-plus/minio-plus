@@ -4,8 +4,5 @@ server:
 spring:
   application:
     name: minio-plus
-
-minio:
-  endpoint: http://192.168.233.129:9100
-  accessKey: root
-  secretKey: Dev@123456
+  profiles:
+    active: prod

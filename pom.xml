@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-            <version>3.14.0</version>
+            <version>3.16.0</version>
         </dependency>
 
         <dependency>
@@ -119,6 +119,43 @@
                         <id>repackage</id>
                         <goals>
                             <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>2.8.0</version>
+                <configuration>
+                    <from>
+                        <image>openjdk:8-jre</image>
+                    </from>
+                    <to>
+                        <image>registry.cn-hangzhou.aliyuncs.com/geowin-a/lwims-java</image>
+                        <auth>
+                            <username>天湘和信息科技</username>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <password>jsb@TXH@2021</password>
+                        </auth>
+                        <tags>
+                            <tag>${version}</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <mainClass>org</mainClass>
+                        <!--容器在运行时暴露的端口-->
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                    </container>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
                         </goals>
                     </execution>
                 </executions>
